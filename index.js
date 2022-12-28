@@ -14,6 +14,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run(){
     try{
         const mediaCollections = client.db('realBook').collection('media');
+        const usersCollections = client.db('realBook').collection('users');
 
         // add post in media
         app.post('/media', async(req, res) =>{
@@ -34,6 +35,39 @@ async function run(){
             const id = req.params.id;
             const filter = {_id: ObjectId(id)};
             const result = await mediaCollections.findOne(filter);
+            res.send(result);
+        });
+
+        // users saved in database
+        app.post('/users', async(req, res) =>{
+            const user = req.body;
+            const result = await usersCollections.insertOne(user);
+            console.log(result)
+            res.send(result);
+        });
+
+        // query email
+        app.get('/users', async(req, res) =>{
+            const email = req.query.email;
+            const query = {email};
+            const users = await usersCollections.findOne(query);
+            res.send(users);
+        });
+
+        app.patch('/users/:id', async(req, res) =>{
+            const id = req.params.id;
+            const filter = {_id: ObjectId(id)}
+            const users = req.body;
+            const option = {upsert: true};
+            const updatedDoc = {
+                $set:{
+                    name: users.name,
+                    email: users.email,
+                    collage: users.collage, 
+                    address: users.address
+                }
+            };
+            const result = await usersCollections.updateOne(filter, updatedDoc, option);
             res.send(result);
         })
     }
