@@ -15,6 +15,7 @@ async function run(){
     try{
         const mediaCollections = client.db('realBook').collection('media');
         const usersCollections = client.db('realBook').collection('users');
+        const commentsCollections = client.db('realBook').collection('comments');
 
         // add post in media
         app.post('/media', async(req, res) =>{
@@ -42,7 +43,6 @@ async function run(){
         app.post('/users', async(req, res) =>{
             const user = req.body;
             const result = await usersCollections.insertOne(user);
-            console.log(result)
             res.send(result);
         });
 
@@ -94,7 +94,6 @@ async function run(){
             const query = {};
             const cursor = await mediaCollections.find(query).sort({react: -1}).limit(3).toArray();
             res.send(cursor);
-            console.log(query);
         });
 
         // top react post by id
@@ -102,6 +101,21 @@ async function run(){
             const id = req.params.id;
             const filter = {_id: ObjectId(id)};
             const result = await mediaCollections.findOne(filter);
+            res.send(result);
+        })
+
+        // comment post 
+        app.post('/comment', async(req, res) =>{
+            const comment = req.body;
+            const result = await commentsCollections.insertOne(comment);
+            res.send(result);
+        });
+
+        // load comments
+        app.get('/comment/:id', async(req, res) =>{
+            const commentId = req.params.id;
+            const query = {id: commentId};
+            const result = await commentsCollections.find(query).toArray();
             res.send(result);
         })
     }
