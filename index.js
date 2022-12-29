@@ -54,6 +54,7 @@ async function run(){
             res.send(users);
         });
 
+        // about update
         app.patch('/users/:id', async(req, res) =>{
             const id = req.params.id;
             const filter = {_id: ObjectId(id)}
@@ -68,6 +69,39 @@ async function run(){
                 }
             };
             const result = await usersCollections.updateOne(filter, updatedDoc, option);
+            res.send(result);
+        });
+
+        // react count update
+        app.patch('/posts/:id', async(req, res) =>{
+            const id = req.params.id;
+            const filter = {_id: ObjectId(id)};
+            const post = req.body;
+            let count = post.oldReact;
+            count = count + 1;
+            const option = {upsert: true};
+            const updatedDoc = {
+                $set: {
+                    react: count
+                }
+            };
+            const result = await mediaCollections.updateOne(filter, updatedDoc, option);
+            res.send(result);
+        });
+
+        // top react 3 post
+        app.get('/topPost', async(req, res) =>{
+            const query = {};
+            const cursor = await mediaCollections.find(query).sort({react: -1}).limit(3).toArray();
+            res.send(cursor);
+            console.log(query);
+        });
+
+        // top react post by id
+        app.get('/topPost/:id', async(req, res) =>{
+            const id = req.params.id;
+            const filter = {_id: ObjectId(id)};
+            const result = await mediaCollections.findOne(filter);
             res.send(result);
         })
     }
