@@ -91,7 +91,7 @@ async function run(){
             const id = req.params.id;
             const filter = {_id: ObjectId(id)};
             const post = req.body;
-            let count = post.oldReact;
+            let count = post.react;
             count = count + 1;
             const option = {upsert: true};
             const updatedDoc = {
