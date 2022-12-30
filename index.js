@@ -46,6 +46,20 @@ async function run(){
             res.send(result);
         });
 
+        // google sign in save to database
+        app.put('/users', async(req, res) =>{
+            const filter = req.body;
+            const oldUser = req.body;
+            const query = await usersCollections.findOne(filter);
+            if(!query){
+                const user = await usersCollections.insertOne(oldUser);
+                res.send(user)
+            }
+            else{
+                return;
+            }
+        })
+
         // query email
         app.get('/users', async(req, res) =>{
             const email = req.query.email;
